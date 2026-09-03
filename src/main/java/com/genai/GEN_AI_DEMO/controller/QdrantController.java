@@ -50,15 +50,17 @@ public class QdrantController {
                                     .topK(3) // retrieve top 3 relevant document from vector store
                                     .similarityThreshold(0.5).build();
         // A Augmentation
-        List<Document> similiarDocument = vectorStore.similaritySearch(searchRequest);
+      //  List<Document> similiarDocument = vectorStore.similaritySearch(searchRequest);
         // extract the text content from the retrieved documents
-        List<String> similiarResult = similiarDocument.stream().map(Document::getText).toList();
+      //  List<String> similiarResult = similiarDocument.stream().map(Document::getText).toList();
+
+
         // g - generation
         String result = chatClient.prompt()
                 .advisors(new SimpleLoggerAdvisor())
-                .system(promptSystemSpec -> promptSystemSpec
-                                         .text(systemTemplate)
-                                        .param("documents",similiarResult))
+//                .system(promptSystemSpec -> promptSystemSpec
+//                                         .text(systemTemplate)
+//                                        .param("documents",similiarResult))
                 .advisors(adviceSpec -> adviceSpec.param(CONVERSATION_ID, username)
                 ).user(prompt)
                 .call()
