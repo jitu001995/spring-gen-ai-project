@@ -68,4 +68,15 @@ public class QdrantController {
         return result;
 
     }
+
+    @GetMapping("/qdrant/search")
+    public List<Document> search(@RequestParam String prompt) {
+
+        return vectorStore.similaritySearch(
+                SearchRequest.builder()
+                        .query(prompt)
+                        .topK(3)
+                        .build()
+        );
+    }
 }

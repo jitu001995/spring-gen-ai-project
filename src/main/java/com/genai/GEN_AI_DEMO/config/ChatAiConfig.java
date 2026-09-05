@@ -6,6 +6,7 @@ import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.rag.advisor.RetrievalAugmentationAdvisor;
+import org.springframework.ai.rag.preretrieval.query.transformation.TranslationQueryTransformer;
 import org.springframework.ai.rag.retrieval.search.VectorStoreDocumentRetriever;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.context.annotation.Bean;
@@ -35,14 +36,25 @@ public class ChatAiConfig {
     }
 
     @Bean
-    public RetrievalAugmentationAdvisor retrievalAugmentationAdvisor(VectorStore vectorStore){
+    public RetrievalAugmentationAdvisor retrievalAugmentationAdvisor(VectorStore vectorStore,ChatClient.Builder chatClientBuilder){
+        TranslationQueryTransformer translationQueryTransformer =
+                TranslationQueryTransformer.builder()
+                        .chatClientBuilder(chatClientBuilder)
+                        .targetLanguage("english")
+                        .build();
         return RetrievalAugmentationAdvisor.builder()
+
+                // Translate Hindi/other-language query -> English
+                .queryTransformers(translationQueryTransformer)
+
+                // Search English documents in Qdrant
                 .documentRetriever(
                         VectorStoreDocumentRetriever.builder()
                                 .vectorStore(vectorStore)
                                 .topK(3)
-                                .similarityThreshold(0.5)
                                 .build()
-                ).build();
+                )
+
+                .build();
     }
 }
